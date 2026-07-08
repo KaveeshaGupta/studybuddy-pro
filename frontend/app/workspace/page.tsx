@@ -122,6 +122,12 @@ export default function WorkspacePage() {
   const totalPages = studySpace.documents.reduce((sum, doc) => sum + doc.pages, 0);
   const suggestedQuestions = deriveSuggestedQuestions(studySpace);
 
+  const quickActions = workspaceQuickActions.map((action) =>
+    action.title === "Start Mission"
+      ? { ...action, onClick: () => router.push("/mission") }
+      : action,
+  );
+
   const fallbackActions: AnswerAction[] = [
     {
       label: "Try another question",
@@ -223,7 +229,7 @@ export default function WorkspacePage() {
         />
         <QuickActions
           title="Quick Actions"
-          actions={workspaceQuickActions}
+          actions={quickActions}
           columns={1}
         />
       </aside>

@@ -80,7 +80,13 @@ export async function sendChatMessage(
 }
 
 export async function generateQuiz(): Promise<{ questions: QuizQuestion[] }> {
-  throw new Error("Not implemented");
+  const res = await fetch(`${API_BASE_URL}/api/quiz`, { method: "POST" });
+
+  if (!res.ok) {
+    throw new Error(`Quiz generation failed (${res.status}).`);
+  }
+
+  return (await res.json()) as { questions: QuizQuestion[] };
 }
 
 export async function evaluateQuiz(_request: {

@@ -25,6 +25,7 @@ export function QuickActions({
           <button
             key={a.title}
             type="button"
+            onClick={a.onClick}
             className="flex items-center gap-[11px] rounded-2xl border border-[#E9E9EE] bg-white p-3.5 text-left"
           >
             <div

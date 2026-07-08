@@ -31,6 +31,7 @@ export interface QuickAction {
   icon: LucideIcon;
   tint: string;
   color: string;
+  onClick?: () => void;
 }
 
 export const homeQuickActions: QuickAction[] = [
