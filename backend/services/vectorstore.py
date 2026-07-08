@@ -24,13 +24,18 @@ def get_vectorstore():
 
 def add_documents(documents: list[Document]) -> int:
     global _vectorstore
-    if _vectorstore is not None:
+    
+    # 1. Fetch the vectorstore (loads from disk if _vectorstore is None)
+    vs = get_vectorstore()
+    if vs is not None:
         try:
-            _vectorstore.delete_collection()
-        except:
+            # 2. Delete the existing collection so we start fresh
+            vs.delete_collection()
+        except Exception:
             pass
-        _vectorstore = None
+    _vectorstore = None
 
+    # 3. Create the new collection with new documents
     _vectorstore = Chroma.from_documents(
         documents=documents,
         embedding=embedding_model,

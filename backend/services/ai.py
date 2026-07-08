@@ -6,6 +6,30 @@ from core.config import settings
 client = Groq(api_key=settings.groq_api_key)
 MODEL = "openai/gpt-oss-20b"
 
+def extract_and_parse_json(text: str):
+    text = text.strip()
+    first_brace = text.find('{')
+    first_bracket = text.find('[')
+    
+    start = -1
+    end = -1
+    
+    if first_brace != -1 and (first_bracket == -1 or first_brace < first_bracket):
+        start = first_brace
+        end = text.rfind('}')
+    elif first_bracket != -1:
+        start = first_bracket
+        end = text.rfind(']')
+        
+    if start != -1 and end != -1:
+        json_str = text[start:end+1]
+        try:
+            return json.loads(json_str)
+        except Exception as e:
+            raise ValueError(f"Failed to parse JSON string: {e}")
+            
+    return json.loads(text)
+
 def answer_question(question: str, context: str) -> str:
     messages = [
         {"role": "system", "content": (
@@ -60,13 +84,8 @@ Study Material:
         reasoning_effort="low",
     )
 
-    raw = response.choices[0].message.content.strip()
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    raw = raw.strip()
-    return json.loads(raw)
+    raw = response.choices[0].message.content
+    return extract_and_parse_json(raw)
 
 def generate_revision_summary(topic: str, context: str) -> str:
     response = client.chat.completions.create(
@@ -98,13 +117,8 @@ def generate_suggested_questions(question: str, answer: str) -> list[str]:
         temperature=0.5,
         reasoning_effort="low",
     )
-    raw = response.choices[0].message.content.strip()
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    raw = raw.strip()
+    raw = response.choices[0].message.content
     try:
-        return json.loads(raw)
+        return extract_and_parse_json(raw)
     except:
         return ["What are the key concepts here?", "Can you explain further?", "Quiz me on this topic."]

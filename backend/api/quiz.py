@@ -32,7 +32,14 @@ async def evaluate_quiz(request: QuizEvaluateRequest):
     for i, (q, user_answer) in enumerate(zip(request.questions, request.answers)):
         correct = q.get("correct_answer", "").strip().lower()
         user = user_answer.strip().lower()
-        is_correct = correct in user or user in correct
+        is_correct = False
+        if q.get("type") == "mcq":
+            user_clean = user.strip().lower()
+            correct_clean = correct.strip().lower()
+            if user_clean == correct_clean or user_clean.startswith(correct_clean + ".") or user_clean.startswith(correct_clean + " "):
+                is_correct = True
+        else:
+            is_correct = correct in user or user in correct
 
         results.append({
             "question_id": q.get("id", i + 1),
