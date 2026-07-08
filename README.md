@@ -87,10 +87,10 @@ Runs at `http://localhost:8000`. Interactive API docs at `http://localhost:8000/
 | POST | `/api/evaluate` | Grade submitted quiz answers |
 | POST | `/api/revision` | Generate a personalized revision summary |
 
-All endpoints currently return `{"status": "Not Implemented"}` pending business logic.
+All endpoints are fully implemented and integrated with the RAG pipeline.
 
 ## Architecture Overview
 
-The frontend is a Next.js App Router client that talks to the FastAPI backend over a typed REST client (`frontend/lib/api.ts`). The backend exposes one router per user-facing feature (`upload`, `chat`, `quiz`, `revision`), each delegating to plain-function services: `vectorstore.py` owns the one genuinely stateful piece (the Chroma client), and `ai.py` holds every LLM-orchestration function (answer, generate quiz, evaluate, summarize) since they share the same shape — retrieve context, call Groq, return structured output. Uploaded documents and their embeddings persist to `backend/uploads/` and `backend/chroma_db/`.
+The frontend is a Next.js App Router client that talks to the FastAPI backend over a typed REST client (`frontend/services/api.ts`). The backend exposes one router per user-facing feature (`upload`, `chat`, `quiz`, `revision`), each delegating to plain-function services: `vectorstore.py` owns the one genuinely stateful piece (the Chroma client), and `ai.py` holds every LLM-orchestration function (answer, generate quiz, evaluate, summarize) since they share the same shape — retrieve context, call Groq, return structured output. Uploaded documents and their embeddings persist to `backend/uploads/` and `backend/chroma_db/`.
 
 Deployment is split rather than bundled: the frontend deploys to Vercel (its native platform — zero config, preview URLs per push), and the backend ships as a Docker container to Hugging Face Spaces, where the embedding model and Chroma persistence actually need a real filesystem.
