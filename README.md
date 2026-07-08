@@ -94,3 +94,13 @@ All endpoints are fully implemented and integrated with the RAG pipeline.
 The frontend is a Next.js App Router client that talks to the FastAPI backend over a typed REST client (`frontend/services/api.ts`). The backend exposes one router per user-facing feature (`upload`, `chat`, `quiz`, `revision`), each delegating to plain-function services: `vectorstore.py` owns the one genuinely stateful piece (the Chroma client), and `ai.py` holds every LLM-orchestration function (answer, generate quiz, evaluate, summarize) since they share the same shape — retrieve context, call Groq, return structured output. Uploaded documents and their embeddings persist to `backend/uploads/` and `backend/chroma_db/`.
 
 Deployment is split rather than bundled: the frontend deploys to Vercel (its native platform — zero config, preview URLs per push), and the backend ships as a Docker container to Hugging Face Spaces, where the embedding model and Chroma persistence actually need a real filesystem.
+
+## Dataset & Model References
+
+StudyBuddy Pro runs a dynamic local-ingestion RAG pipeline where the primary source documents are user-uploaded study notes (PDFs). In addition, the project leverages the following open-source models and datasets:
+
+1. **Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2` (hosted on Hugging Face)
+   * **Dataset/Model Reference**: [all-MiniLM-L6-v2 Model Card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+   * **Purpose**: Generates 384-dimensional dense vector embeddings of text chunks for semantic indexing and search retrieval.
+2. **LLM Engine**: `openai/gpt-oss-20b` (hosted on Groq Cloud)
+   * **Purpose**: Generates context-grounded answers, follow-up questions, quizzes, and revision summaries.
