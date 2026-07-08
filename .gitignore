@@ -145,5 +145,8 @@ vite.config.ts.timestamp-*
 backend/venv/
 backend/__pycache__/
 backend/.env
-backend/chroma_store/
+backend/chroma_db/*
+!backend/chroma_db/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
 *.pyc
