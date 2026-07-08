@@ -83,3 +83,28 @@ def generate_revision_summary(topic: str, context: str) -> str:
         reasoning_effort="low",
     )
     return response.choices[0].message.content
+
+def generate_suggested_questions(question: str, answer: str) -> list[str]:
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {"role": "system", "content": (
+                "Based on the question and answer below, generate exactly 3 follow-up study questions. "
+                "Return ONLY a JSON array of 3 strings, no other text.\n"
+                f"Question: {question}\nAnswer: {answer[:500]}"
+            )},
+            {"role": "user", "content": "Generate 3 follow-up questions."}
+        ],
+        temperature=0.5,
+        reasoning_effort="low",
+    )
+    raw = response.choices[0].message.content.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    raw = raw.strip()
+    try:
+        return json.loads(raw)
+    except:
+        return ["What are the key concepts here?", "Can you explain further?", "Quiz me on this topic."]

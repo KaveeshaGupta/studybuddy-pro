@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 from services.vectorstore import similarity_search, is_indexed
-from services.ai import answer_question
+from services.ai import answer_question, generate_suggested_questions
 
 router = APIRouter()
 
@@ -22,14 +22,23 @@ async def chat(request: ChatRequest):
         for c in chunks
     ])
 
-    citations = list(set([
-        f"{c.metadata.get('source','?')} p.{c.metadata.get('page','?')}"
-        for c in chunks
-    ]))
+    # Structured citations as objects
+    seen = set()
+    citations = []
+    for c in chunks:
+        key = (c.metadata.get('source','?'), c.metadata.get('page','?'))
+        if key not in seen:
+            seen.add(key)
+            citations.append({
+                "filename": c.metadata.get('source','?'),
+                "page": c.metadata.get('page','?')
+            })
 
     answer = answer_question(request.question, context)
+    suggested = generate_suggested_questions(request.question, answer)
 
     return {
         "answer": answer,
-        "citations": citations
+        "citations": citations,
+        "suggested_questions": suggested
     }
