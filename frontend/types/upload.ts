@@ -1,10 +1,16 @@
-export interface UploadedDocument {
-  id: string;
+export interface UploadedFileInfo {
   filename: string;
-  status: "processing" | "ready" | "failed";
+  pages: number;
 }
 
 export interface UploadFilesResponse {
-  status: string;
-  documents: UploadedDocument[];
+  success: boolean;
+  files: UploadedFileInfo[];
+  total_chunks: number;
+}
+
+export interface UploadProgressEvent {
+  loaded: number;
+  total: number;
+  percent: number;
 }

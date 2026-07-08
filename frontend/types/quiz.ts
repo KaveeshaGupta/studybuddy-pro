@@ -1,38 +1,30 @@
+/** Shapes matching the real backend (POST /api/quiz, POST /api/evaluate). */
 export interface QuizQuestion {
-  id: string;
+  id: number;
+  type: "mcq" | "short_answer";
   question: string;
-  options: string[];
-  correctOptionIndex: number;
+  options?: string[];
+  correct_answer: string;
+  topic: string;
 }
 
-export interface GenerateQuizRequest {
-  sessionId: string;
-  topic?: string;
-  numQuestions: number;
-}
-
-export interface GenerateQuizResponse {
-  status: string;
+export interface QuizProgress {
   questions: QuizQuestion[];
+  currentIndex: number;
+  answers: Record<number, string>;
 }
 
-export interface QuizAnswer {
-  questionId: string;
-  selectedOptionIndex: number;
+export interface QuizResultItem {
+  question_id: number;
+  correct: boolean;
+  topic: string;
+  correct_answer: string;
+  user_answer: string;
 }
 
-export interface EvaluateQuizRequest {
-  sessionId: string;
-  answers: QuizAnswer[];
-}
-
-export interface QuizResult {
+export interface QuizResults {
+  results: QuizResultItem[];
+  weak_topics: string[];
   score: number;
-  totalQuestions: number;
-  weakTopics: string[];
-}
-
-export interface EvaluateQuizResponse {
-  status: string;
-  result: QuizResult;
+  total: number;
 }
