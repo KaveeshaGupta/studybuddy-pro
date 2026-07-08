@@ -89,15 +89,35 @@ export async function generateQuiz(): Promise<{ questions: QuizQuestion[] }> {
   return (await res.json()) as { questions: QuizQuestion[] };
 }
 
-export async function evaluateQuiz(_request: {
+export async function evaluateQuiz(request: {
   questions: QuizQuestion[];
   answers: string[];
 }): Promise<QuizResults> {
-  throw new Error("Not implemented");
+  const res = await fetch(`${API_BASE_URL}/api/evaluate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Quiz evaluation failed (${res.status}).`);
+  }
+
+  return (await res.json()) as QuizResults;
 }
 
 export async function generateRevision(
-  _request: RevisionRequest,
+  request: RevisionRequest,
 ): Promise<GenerateRevisionResponse> {
-  throw new Error("Not implemented");
+  const res = await fetch(`${API_BASE_URL}/api/revision`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Revision generation failed (${res.status}).`);
+  }
+
+  return (await res.json()) as GenerateRevisionResponse;
 }

@@ -15,8 +15,9 @@ import {
   useSetQuizCurrentIndex,
   useSetQuizProgress,
   useStudySpace,
+  useSetQuizResults,
 } from "@/lib/store";
-import { generateQuiz } from "@/services/api";
+import { generateQuiz, evaluateQuiz } from "@/services/api";
 
 const STAGES = [
   "Preparing your mission...",
@@ -41,6 +42,7 @@ export default function MissionPage() {
   const setQuizProgress = useSetQuizProgress();
   const setQuizAnswer = useSetQuizAnswer();
   const setQuizCurrentIndex = useSetQuizCurrentIndex();
+  const setQuizResults = useSetQuizResults();
 
   const [phase, setPhase] = useState<Phase>("loading");
   const [stageIndex, setStageIndex] = useState(0);
@@ -146,9 +148,21 @@ export default function MissionPage() {
         shortAnswerValue={question.type === "short_answer" ? (answers[question.id] ?? "") : ""}
         onShortAnswerChange={(value) => setQuizAnswer(question.id, value)}
         onPrev={() => setQuizCurrentIndex(Math.max(0, currentIndex - 1))}
-        onNext={() => {
+        onNext={async () => {
           if (isLast) {
             if (!allAnswered) return;
+            try {
+              // Convert quiz answers map into array matching questions order
+              const answersArray = questions.map((q) => answers[q.id] || "");
+              const quizResults = await evaluateQuiz({
+                questions: questions,
+                answers: answersArray,
+              });
+              setQuizResults(quizResults);
+              setQuizProgress(null);
+            } catch (err) {
+              console.error("Failed to grade quiz:", err);
+            }
             router.push("/results");
             return;
           }

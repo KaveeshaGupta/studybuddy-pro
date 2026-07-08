@@ -1,13 +1,13 @@
 export interface RevisionRequest {
-  sessionId: string;
+  weak_topics: string[];
 }
 
 export interface RevisionSummary {
   topic: string;
   summary: string;
+  citations: string[];
 }
 
 export interface GenerateRevisionResponse {
-  status: string;
   summaries: RevisionSummary[];
 }
